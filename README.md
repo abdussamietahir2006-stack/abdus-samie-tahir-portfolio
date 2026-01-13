@@ -4,7 +4,7 @@ A modern, responsive personal portfolio website to showcase my projects, skills,
 Built to create a strong online presence and help clients understand my work quickly.
 
 ## 🚀 Live Preview
-🔗 (Add live link here if deployed)
+🔗 abdus-samie-tahir-portfolio.vercel.app
 
 ## 📌 Features
 - Clean and modern UI

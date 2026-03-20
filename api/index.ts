@@ -19,6 +19,11 @@ app.get("/api/test", async (req, res) => {
   }
 });
 
+// ✅ ADD THIS HERE
+app.get("/api/check", (req, res) => {
+  res.json({ status: "working" });
+});
+
 // Example route
 app.get("/api/hello", (req, res) => {
   res.json({ message: "Hello from backend 🚀" });

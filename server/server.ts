@@ -1,17 +1,10 @@
 import dotenv from "dotenv";
+dotenv.config();
+
 import path from "path";
-import { fileURLToPath } from "url";
-
-// Load .env file with explicit path
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.resolve(__dirname, ".env") });
-
 import express from "express";
 import cors from "cors";
-
-// Debug (optional)
-console.log("ENV TEST:", process.env.MONGO_URI);
+import serverless from "serverless-http";
 
 // Routes & DB
 import { connectDB } from "./config/db";
@@ -23,40 +16,30 @@ import skillRoutes from "./routes/skillRoutes";
 import uploadRoutes from "./routes/uploadRoutes";
 import { errorHandler } from "./middleware/errorHandler";
 
-async function startServer() {
-  const app = express();
+const app = express();
 
-  const PORT = Number(process.env.PORT) || 5000;
+// ✅ connect DB
+connectDB();
 
-  // Connect DB
-  await connectDB();
+app.use(cors());
+app.use(express.json());
 
-  // Middleware
-  app.use(cors());
-  app.use(express.json());
+// ✅ ROUTES
+app.use("/api/projects", projectRoutes);
+app.use("/api/contact", contactRoutes);
+app.use("/api/admin", adminAuthRoutes);
+app.use("/api/content", contentRoutes);
+app.use("/api/skills", skillRoutes);
+app.use("/api/upload", uploadRoutes);
 
-  // Routes
-  app.use("/api/projects", projectRoutes);
-  app.use("/api/contact", contactRoutes);
-  app.use("/api/admin", adminAuthRoutes);
-  app.use("/api/content", contentRoutes);
-  app.use("/api/skills", skillRoutes);
-  app.use("/api/upload", uploadRoutes);
+// ✅ STATIC
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-  // Static uploads
-  app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.get("/", (req, res) => {
+  res.send("API is running on Vercel ✅");
+});
 
-  // Root route
-  app.get("/", (req, res) => {
-    res.send("API is running ✅");
-  });
+app.use(errorHandler);
 
-  // Error Handler
-  app.use(errorHandler);
-
-  app.listen(PORT, () => {
-    console.log(`✅ Server running on http://localhost:${PORT}`);
-  });
-}
-
-startServer();
+// ✅ THIS IS THE MOST IMPORTANT LINE
+export default serverless(app);
